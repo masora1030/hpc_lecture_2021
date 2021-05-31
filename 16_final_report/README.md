@@ -1,9 +1,9 @@
-Student ID   : 21M30689
-Student Name : Sora Takashima
+- Student ID   : 21M30689
+- Student Name : Sora Takashima
 
-base (MPI)                                          : example.cpp
-my_answer (MPI + cache blocking + Open MP + SIMD)   : my_matmul.cpp
-my_answer (MPI + CUDA + shared memory)              : my_matmul.cu
+- base (MPI)                                          : example.cpp
+- my_answer (MPI + cache blocking + Open MP + SIMD)   : my_matmul.cpp
+- my_answer (MPI + CUDA + shared memory)              : my_matmul.cu
 
 ## Example
 
