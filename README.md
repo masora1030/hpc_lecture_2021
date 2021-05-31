@@ -5,15 +5,55 @@ Student Name : Sora Takashima
 
 base (MPI)                                          : example.cpp
 my_answer (MPI + cache blocking + Open MP + SIMD)   : my_matmul.cpp
+my_answer (MPI + CUDA + shared memory)              : my_matmul.cu
 
 ## Example
 
 - prepare
 
+- (on CPU or GPU)
+
 ```
 21M30689@login0:~/hpc_lecture_2021/16_final_report> module load gcc/10.2.0 intel-mpi/19.9.304
 21M30689@login0:~/hpc_lecture_2021/16_final_report> mpicxx my_matmul.cpp -fopenmp -march=native -O3
 ```
+
+or
+
+- (on GPU)
+
+```
+21M30689@login0:~/hpc_lecture_2021/16_final_report> module load vim cmake gcc cuda/11.2.146 openmpi nccl cudnn intel
+21M30689@login0:~/hpc_lecture_2021/16_final_report> nvcc my_matmul.cu -lmpi
+```
+
+### base (MPI)
+
+- N=1024, np=1 (on login node)
+
+```
+21M30689@login0:~/hpc_lecture_2021/16_final_report> ./a.out
+N    : 1024
+comp : 2.524679 s
+comm : 0.002729 s
+total: 2.527408 s (0.849678 GFlops)
+error: 0.000129
+21M30689@login0:~/hpc_lecture_2021/16_final_report>
+```
+
+- N=1024, np=4 (on login node)
+
+```
+21M30689@login0:~/hpc_lecture_2021/16_final_report> mpirun -np 4 ./a.out 
+N    : 1024
+comp : 0.520160 s
+comm : 0.004226 s
+total: 0.524385 s (4.095239 GFlops)
+error: 0.000129
+21M30689@login0:~/hpc_lecture_2021/16_final_report>
+```
+
+### my_answer (MPI + cache blocking + Open MP + SIMD)
 
 - N=1024, np=4 (on login node)
 
@@ -43,6 +83,36 @@ comm : 0.015460 s
 total: 0.073377 s (234.132636 GFlops)
 error: 0.000258
 ```
+
+- baseに比べてかなり高速に．cache blockingとSIMDが強い
+
+### my_answer (MPI + CUDA + shared memory)
+
+- N=2048, np=1 (on f_node)
+
+```
+(b-thesis-takashima) 21M30689@r2i6n1:~/hpc_lecture_2021/16_final_report> nvcc my_matmul.cu -lmpi
+(b-thesis-takashima) 21M30689@r2i6n1:~/hpc_lecture_2021/16_final_report> ./a.out
+N    : 2048
+comp : 0.052542 s
+comm : 0.072600 s
+total: 0.125142 s (137.283188 GFlops)
+error: 0.000364
+```
+
+- N=2048, np=4 (on f_node)
+
+```
+(b-thesis-takashima) 21M30689@r2i6n1:~/hpc_lecture_2021/16_final_report> mpirun -np 4 ./a.out 
+N    : 2048
+comp : 0.033700 s
+comm : 0.304231 s
+total: 0.337931 s (50.838465 GFlops)
+error: 0.000364
+(b-thesis-takashima) 21M30689@r2i6n1:~/hpc_lecture_2021/16_final_report>
+```
+
+- compは早くなっているので，Nをより大きくしてnpを増やすと，commの増大よりcompの減少が優って高速に動作するかも．結果は正しそう．
 
 
 |          | Topic                                | Sample code               |
